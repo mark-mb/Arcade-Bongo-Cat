@@ -49,6 +49,8 @@
   // If your hitbox uses axis for X and Y position or you are using a fight stick change this variable to 1
   var ejes = 0;
   var stick = 0;
+
+  var unEje = 0; // Solo ejeX? -> 1
   
 
   // Existen controladores que usan logica negativa en sus sticks, si usando una configuracion 
@@ -196,6 +198,46 @@
     return b == 1.0;
   }
 
+    function stickIzquierda() {
+        palado.classList.remove("invisible")
+        palotrolao.classList.add("invisible")
+
+        brazoi=1
+    }
+
+    function stickDerecha() {
+        palado.classList.add("invisible")
+        palotrolao.classList.remove("invisible")
+        brazoi=3
+        left0.classList.remove("invisible")
+        left1.classList.add("invisible")
+        left2.classList.add("invisible")
+    }
+
+    function stickHorizNeutro() {
+        palado.classList.add("invisible")
+        palotrolao.classList.add("invisible")
+    }
+
+    function stickArriba() {
+        parriba.classList.remove("invisible")
+        pabajo.classList.add("invisible")
+
+        brazoi=2
+    }
+
+    function stickAbajo() {
+        parriba.classList.add("invisible")
+        pabajo.classList.remove("invisible")
+
+        brazoi=4
+    }
+
+    function stickVertNeutro() {
+        parriba.classList.add("invisible")
+        pabajo.classList.add("invisible")
+    }
+
   function gameLoop() {
     var vuelta= true
     var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
@@ -304,96 +346,90 @@
 
 
     if (ejes) {
-      switch (gp.axes[nEjeX]*invertX) { 
-        case -1:
-          palado.classList.remove("invisible")
-          palotrolao.classList.add("invisible")
+      if (unEje) {
+          var val = gp.axes[nEjeX]
+          if (val < -0.9 && val > -1.1)
+          {
+              // Arriba == -1
+              stickArriba()
+              stickHorizNeutro()
+          }
+          else if (val < 0.1 && val > -0.1)
+          {
+               // Abajo == 0
+               stickAbajo()
+               stickHorizNeutro()
+          }
+          else if (val < -0.4 && val > -0.6)
+          {
+                // Derecha == -0.5
+                stickDerecha()
+                stickVertNeutro()
+          }
+          else if (val < 0.85 && val > 0.75)
+          {
+                // Izquierda == 0.75
+                stickIzquierda()
+                stickVertNeutro()
+          }
+      }
+      else
+      {
+          switch (gp.axes[nEjeX]*invertX) {
+            case -1:
+              stickIzquierda()
+              break;
+            case 1:
+              stickDerecha()
+              break;
+            default:
+                stickHorizNeutro()
+              break;
+          }
 
-          brazoi=1
-          break;
-        case 1:
-          palado.classList.add("invisible")
-          palotrolao.classList.remove("invisible")
-          brazoi=3
-          left0.classList.remove("invisible")
-          left1.classList.add("invisible")
-          left2.classList.add("invisible")
-          // console.log("izq");
-          break;
-        default:
-        palado.classList.add("invisible")
-        palotrolao.classList.add("invisible")
-          // console.log("neutro");
-          break;
+          switch (gp.axes[nEjeY]*invertY) {
+            case 1:
+              stickArriba()
+              break;
+            case -1:
+              stickAbajo()
+              break;
+            default:
+              stickVertNeutro()
+
+
+              break;
+          }
       }
 
-      switch (gp.axes[nEjeY]*invertY) { 
-        case 1:
-          parriba.classList.remove("invisible")
-          pabajo.classList.add("invisible")
-
-          brazoi=2
-          break;
-        case -1:
-          parriba.classList.add("invisible")
-          pabajo.classList.remove("invisible")
-
-          brazoi=4
-          break;
-        default:
-          parriba.classList.add("invisible")
-          pabajo.classList.add("invisible")
-          
-          
-          break;
-      }
-      
     }
     else{
-      switch (x) {  
+      switch (x) {
         case -1:
-          palado.classList.remove("invisible")
-          palotrolao.classList.add("invisible")
-
-          brazoi=1
+          stickIzquierda()
           break;
         case 1:
-          palado.classList.add("invisible")
-          palotrolao.classList.remove("invisible")
-          brazoi=2
-          left0.classList.remove("invisible")
-          left1.classList.add("invisible")
-          left2.classList.add("invisible")
-          // console.log("izq");
+          stickDerecha()
           break;
         default:
-        palado.classList.add("invisible")
-        palotrolao.classList.add("invisible")
-          // console.log("neutro");
+          stickHorizNeutro()
           break;
       }
 
-      switch (y) { 
+      switch (y) {
         case 1:
-          parriba.classList.remove("invisible")
-          pabajo.classList.add("invisible")
-
-          brazoi=3
+          stickArriba()
           break;
         case -1:
-          parriba.classList.add("invisible")
-          pabajo.classList.remove("invisible")
-
-          brazoi=3
+          stickAbajo()
           break;
         default:
-          parriba.classList.add("invisible")
-          pabajo.classList.add("invisible")
-          
-          
+            stickVertNeutro()
+
           break;
       }
     }
+
     x=0
     y=0
     
